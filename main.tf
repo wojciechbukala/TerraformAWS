@@ -12,6 +12,28 @@ provider "aws" {
   region = "us-east-1"
 }
 
+resource "aws_s3_bucket" "tfstate" {
+  bucket = "tf-state-bukala"
+}
+
+resource "aws_s3_bucket_versioning" "tfstate_version" {
+  bucket = aws_s3_bucket.tfstate.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_dynamodb_table" "terraform_db" {
+  name = "terraform_db"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "lock_id"
+  attribute {
+    name = "lock_id"
+    type = "S"
+  }
+}
+
 resource "aws_sns_topic" "serverless_sns" {
   name = "serverless1_sns_tf"
 }
